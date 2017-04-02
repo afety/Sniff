@@ -64,7 +64,12 @@ int main() {
          * */
 
         pcap_t *device = pcap_open_live(devStr, 65535, 1, 0, errBuf);
-
+	int *data_link_types;
+	int data_links = pcap_list_datalinks(device, &data_link_types);
+	for(int j=0; j!=data_links; j++){
+		printf("type:%d\n", data_link_types[j]);
+}
+	printf("\n\n");
         /* 链路层解析
          * int pcap_datalink(pcap_t* p)
          * 返回数据链路层类型
@@ -95,8 +100,8 @@ int main() {
          *
          * 该函数在收到一个数据包后会立即返回
          * */
-        struct pcap_pkthdr packet;
-        const u_char* pktStr = pcap_next(device, &packet);
+        //struct pcap_pkthdr packet;
+        //const u_char* pktStr = pcap_next(device, &packet);
 
 
         /* 网络数据接收函数
@@ -128,12 +133,8 @@ int main() {
          * 第三个参数在超过to_ms毫秒后就会返回(to_ms 为pcap_open_live 的第四个参数)
          * */
 
-        if(!pktStr){
-            printf("did not capture a packet!\n");
-            exit(1);
-        }
-        int id=1;
-        int pcap_result = pcap_loop(device, -1, printpacket, (u_char *) &id);
+        //int id=1;
+        //int pcap_result = pcap_loop(device, -1, printpacket, (u_char *) &id);
 
 //        printf("Packet length: %d\n", packet.len);
 //        printf("Number of bytes: %d\n", packet.caplen);

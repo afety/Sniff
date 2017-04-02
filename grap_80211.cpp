@@ -52,10 +52,29 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 
+    struct pcap_pkthdr packet;
+    int seq = 0;
+    while(true) {
+        const u_char *pktStr = pcap_next(device, &packet);
+        seq ++;
+        printf("Seq:%d\n", seq);
+        printf("Packet length:%d\n", packet.len);
+        printf("Number of bytes:%d\n", packet.caplen);
+        printf("Time:%s\n", ctime((const time_t*)packet.ts.tv_sec));
+
+        for(int i=0; i!=packet.caplen, i++){
+            printf("%02x", pktStr[i]);
+            if((i+1)%16 == 0){
+                printf("\n")
+            }
+        }
+        printf("\n\n");
+    }
+
 
 //    struct pcap_pkthdr packet;
-    int id = 1;
-    int pcap_result = pcap_loop(device, -1, process_packet, (u_char*) &id);
+//    int id = 1;
+//    int pcap_result = pcap_loop(device, -1, process_packet, (u_char*) &id);
 
     return 0;
 }
