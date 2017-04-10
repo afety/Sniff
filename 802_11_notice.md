@@ -57,7 +57,15 @@ LINKTYPE_IEEE802_11_AVS             163                       DLT_IEEE802_11_RAD
 ### 针对Prism的官方声明
 
 3. linktype_ieee802_11_radiotap:radiotap是目前ieee802.11事实上的标准，
-相对于传统的Prism头和AVS头部，灵活性更强
-
+相对于传统的Prism头和AVS头部，灵活性更强，一般而言，radoitap头格式如下：
+    > Version: 1byte, always 0
+    > Header Pad: 1byte, always 0
+    > Header Length: 2byte
+    > Present: 4byte, 表示radiotap数据的位掩码。
+    radiotap的数据紧跟其头部。
+    当其中的位掩码为true时，表示有对应的数据，可以认为每一比特表示一种类型。
+    比如bit5为1表示有通道数据，则可以获取到信号强度。
+    反之就是没有对应的数据。
+    因此radiotap的长度其实是不固定的。第31位bit为1表示还有多个present
 4. linktype_ieee802_11_AVS:传统的802.11帧头的一种
     > [详细信息](http://web.archive.org/web/20040803232023/http://www.shaftnet.org/~pizza/software/capturefrm.txt)

@@ -5,7 +5,7 @@
 #include<pcap.h>
 #include<iostream>
 #include<stdio.h>
-
+#include<stdlib.h>
 using namespace std;
 
 void process_packet(u_char* arg, const struct pcap_pkthdr* p, const u_char* packet){
@@ -26,10 +26,11 @@ void process_packet(u_char* arg, const struct pcap_pkthdr* p, const u_char* pack
 }
 
 
-int main(int argc, char *argv[]){
+int main(){
     char errBuf[PCAP_ERRBUF_SIZE], *devStr;
     devStr = pcap_lookupdev(errBuf);
-    if(!devStr){
+    devStr = "wlx50fa84099dc8";
+	if(!devStr){
         printf("Cannot find a internet card!");
         exit(1);
     }
@@ -42,8 +43,8 @@ int main(int argc, char *argv[]){
 
     pcap_lookupnet(devStr, &netaddr, &mask, errBuf);
 
-    printf("netaddr:%s\n", netaddr);
-    printf("mask:%s\n", mask);
+    printf("netaddr:%d\n", netaddr);
+    printf("mask:%d\n", mask);
 
 
     pcap_t* device = pcap_open_live(devStr, 65535, 1, 0, errBuf);
@@ -51,21 +52,28 @@ int main(int argc, char *argv[]){
         printf("Error: can not open NIC");
         exit(1);
     }
-
+	int data_link_type = pcap_datalink(device);
     struct pcap_pkthdr packet;
     int seq = 0;
     while(true) {
         const u_char *pktStr = pcap_next(device, &packet);
         seq ++;
-        printf("Seq:%d\n", seq);
+        printf("linktype:%d\n", data_link_type);
+		printf("Seq:%d\n", seq);
         printf("Packet length:%d\n", packet.len);
         printf("Number of bytes:%d\n", packet.caplen);
-        printf("Time:%s\n", ctime((const time_t*)packet.ts.tv_sec));
-
-        for(int i=0; i!=packet.caplen, i++){
+        printf("Time:%s\n", ctime((const time_t*)&packet.ts.tv_sec));
+  		if(!pktStr){  
+	    	printf("did not capture a packet!\n");  
+	    	exit(1);  
+	  	}  	  
+		printf("Receive packet");
+		printf("len:%d\n",sizeof(packet)/sizeof(u_char));
+        for(int i=0; i!=packet.len; i++){
             printf("%02x", pktStr[i]);
-            if((i+1)%16 == 0){
-                printf("\n")
+            printf("||");
+			if((i+1)%16 == 0){
+                printf("\n");
             }
         }
         printf("\n\n");
